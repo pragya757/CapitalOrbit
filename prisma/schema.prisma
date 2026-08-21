@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                  String                   @id @default(uuid())
+  name                String
+  email               String                   @unique
+  password            String
+  monthlyBudget       Float                    @default(15000)
+  currency            String                   @default("INR")
+  expenses            Expense[]
+  budgets             Budget[]
+  incomes             Income[]
+  recurring           RecurringRule[]
+  categories          Category[]
+  savingsGoals        SavingsGoal[]
+  merchantPreferences UserMerchantPreference[]
+  financialDecisions  FinancialDecision[]
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  isCustom  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name])
+}
+
+model Expense {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount             Float
+  category           String
+  description        String
+  date               String
+  paymentMethod      String
+  isRecurring        Boolean  @default(false)
+  recurringFrequency String?
+  source             String   @default("manual")
+  status             String   @default("captured")
+  razorpayPaymentId  String?  @unique
+  razorpayOrderId    String?
+  email              String?
+  contact            String?
+  merchantName       String?
+  categorySource     String?
+  categoryConfidence Float?
+  categoryReason     String?
+  createdAt          DateTime @default(now())
+}
+
+model UserMerchantPreference {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchantName String
+  category     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, merchantName])
+}
+
+model Budget {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String
+  limit     Float
+  period    String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, category])
+}
+
+model Income {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount             Float
+  source             String
+  description        String?
+  date               String
+  isRecurring        Boolean  @default(false)
+  recurringFrequency String?
+  createdAt          DateTime @default(now())
+}
+
+model RecurringRule {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String
+  amount        Float
+  category      String?
+  source        String?
+  description   String
+  paymentMethod String?
+  frequency     String
+  nextDate      String
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model SavingsGoal {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  targetAmount Float
+  savedAmount  Float    @default(0)
+  deadline     String?
+  createdAt    DateTime @default(now())
+}
+
+model FinancialDecision {
+  id                   String   @id @default(uuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query                String
+  decisionType         String
+  decision             String
+  riskLevel            String
+  requestedAmount      Float?
+  safeToSpend          Float
+  remainingSafeToSpend Float
+  reason               String
+  resultJson           String
+  createdAt            DateTime @default(now())
+}
