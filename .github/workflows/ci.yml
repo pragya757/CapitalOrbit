@@ -12,6 +12,11 @@ jobs:
     env:
       DATABASE_URL: "file:./dev.db"
       JWT_SECRET: "ci-secret-key-123456789"
+      RAZORPAY_KEY_ID: "rzp_test_TSVHW3c3AMEkWV"
+      RAZORPAY_KEY_SECRET: "4BMoupzEyun0QPMZ8OHOyOIG"
+      NEXT_PUBLIC_RAZORPAY_KEY_ID: "rzp_test_TSVHW3c3AMEkWV"
+      NODE_ENV: "test"
+
     steps:
       - uses: actions/checkout@v4
       
@@ -24,11 +29,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Generate Prisma Client
-        run: npx prisma generate
+      - name: Generate Prisma Client & Push DB Schema
+        run: |
+          npx prisma generate
+          npx prisma db push --accept-data-loss
         
-      - name: Run tests
+      - name: Run Vitest Unit Tests
         run: npx vitest run
         
-      - name: Build Next.js
+      - name: Build Next.js Production App
         run: npm run build
