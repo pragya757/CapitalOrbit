@@ -2,14 +2,15 @@ import type { FinancialDecisionRequest, DecisionType } from '../types'
 
 /**
  * Natural language intent and entity parser.
- * Extracts decision type, monetary amounts, descriptions, percentages, and deadlines.
+ * Robustly extracts decision type, monetary amounts (e.g. ₹20,000, 20000, 15k, 1.5L),
+ * item descriptions, percentages, and deadlines.
  */
 export function parseNaturalLanguageQuery(query: string): FinancialDecisionRequest {
   if (!query || typeof query !== 'string') {
     return {
       type: 'PURCHASE',
-      amount: 0,
-      description: 'Unspecified Item',
+      amount: undefined,
+      description: 'Purchase',
       rawQuery: '',
     }
   }
@@ -17,28 +18,48 @@ export function parseNaturalLanguageQuery(query: string): FinancialDecisionReque
   const cleanQuery = query.trim()
   const lower = cleanQuery.toLowerCase()
 
-  // 1. Extract Amounts (Support ₹20,000, 20k, 1.5L, 1 lakh, etc.)
+  // 1. Extract Amounts (Support ₹20,000, 20000, 15k, 1.5L, 1 lakh, etc.)
   let amount: number | undefined
 
-  // Lakh match: 1.5L or 1 lakh
+  // Lakh match: 1.5L or 1.5 lakh or 2 lakh
   const lakhMatch = lower.match(/(?:₹|rs\.?|inr)?\s*([0-9]+(?:\.[0-9]+)?)\s*(?:lakh|l\b)/i)
   if (lakhMatch) {
-    amount = Math.round(parseFloat(lakhMatch[1]) * 100000)
-  }
-
-  // K match: 20k, 5k
-  if (!amount) {
-    const kMatch = lower.match(/(?:₹|rs\.?|inr)?\s*([0-9]+(?:\.[0-9]+)?)\s*k\b/i)
-    if (kMatch) {
-      amount = Math.round(parseFloat(kMatch[1]) * 1000)
+    const val = parseFloat(lakhMatch[1])
+    if (!isNaN(val) && val > 0) {
+      amount = Math.round(val * 100000)
     }
   }
 
-  // Standard numeric match: ₹20,000 or ₹1,20,000 or 20000
+  // K match: 20k, 15k, 5k
   if (!amount) {
-    const numMatch = lower.match(/(?:₹|rs\.?|inr)?\s*([0-9]{1,3}(?:,[0-9]{2,3})+|[0-9]{3,7})/i)
+    const kMatch = lower.match(/(?:₹|rs\.?|inr)?\s*([0-9]+(?:\.[0-9]+)?)\s*k\b/i)
+    if (kMatch) {
+      const val = parseFloat(kMatch[1])
+      if (!isNaN(val) && val > 0) {
+        amount = Math.round(val * 1000)
+      }
+    }
+  }
+
+  // Standard numeric match with optional currency symbol or commas: ₹20,000 / 20000 / ₹15,000 / 50000 / ₹50,000
+  if (!amount) {
+    const numMatch = lower.match(/(?:₹|rs\.?|inr)?\s*([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{1,3}(?:,[0-9]{2,3})+|[0-9]{3,7})/i)
     if (numMatch) {
-      amount = parseFloat(numMatch[1].replace(/,/g, ''))
+      const parsedVal = parseFloat(numMatch[1].replace(/,/g, ''))
+      if (!isNaN(parsedVal) && parsedVal > 0) {
+        amount = parsedVal
+      }
+    }
+  }
+
+  // Fallback regex for simple digits in query (e.g., 20000)
+  if (!amount) {
+    const simpleDigitMatch = lower.match(/([0-9]+)/)
+    if (simpleDigitMatch) {
+      const parsedVal = parseFloat(simpleDigitMatch[1])
+      if (!isNaN(parsedVal) && parsedVal > 0) {
+        amount = parsedVal
+      }
     }
   }
 
@@ -46,7 +67,10 @@ export function parseNaturalLanguageQuery(query: string): FinancialDecisionReque
   let percentageChange: number | undefined
   const percentMatch = lower.match(/([0-9]+(?:\.[0-9]+)?)\s*%/i)
   if (percentMatch) {
-    percentageChange = parseFloat(percentMatch[1])
+    const pVal = parseFloat(percentMatch[1])
+    if (!isNaN(pVal)) {
+      percentageChange = pVal
+    }
   }
 
   // 3. Extract Deadline (e.g. 6 months, 8 months)
@@ -57,13 +81,13 @@ export function parseNaturalLanguageQuery(query: string): FinancialDecisionReque
   }
 
   // 4. Extract Description / Item Name
-  let description = 'Expense Purchase'
-  const forOnMatch = lower.match(/(?:on|for|buy|purchase|afford|a|an)\s+([a-z0-9\s]+?)(?:\?|\.|$|in\s|for\s|with\s)/i)
-  if (forOnMatch && forOnMatch[1]) {
-    const candidate = forOnMatch[1]
-      .replace(/\b(can|i|spend|buy|afford|a|an|the|this|my|me)\b/gi, '')
-      .trim()
-    if (candidate.length > 1) {
+  let description = 'Purchase'
+
+  // Pattern A: "on a phone", "for a laptop", "on laptop", "for phone"
+  const onForMatch = lower.match(/(?:on|for)\s+(?:a|an|the)?\s*([a-z0-9\s]+?)(?:\?|\.|$)/i)
+  if (onForMatch && onForMatch[1]) {
+    const candidate = onForMatch[1].trim()
+    if (candidate && !/^[0-9,₹\s]+$/.test(candidate) && !['in', 'for', 'on', 'months', 'month'].includes(candidate)) {
       description = candidate
         .split(/\s+/)
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -71,12 +95,33 @@ export function parseNaturalLanguageQuery(query: string): FinancialDecisionReque
     }
   }
 
-  // Fallback: match noun immediately after amount (e.g. ₹15,000 phone -> Phone)
-  if (description === 'Expense Purchase' || description === '') {
-    const afterAmountMatch = lower.match(/(?:[0-9,]+|k|lakh)\s+([a-z0-9]+)/i)
-    if (afterAmountMatch && afterAmountMatch[1] && !['in', 'for', 'on', 'months', 'month', 'years', 'year', 'percent', '%'].includes(afterAmountMatch[1])) {
-      description = afterAmountMatch[1].charAt(0).toUpperCase() + afterAmountMatch[1].slice(1)
+  // Pattern B: "a ₹50,000 laptop" or "₹20,000 laptop" or "20000 laptop"
+  if (description === 'Purchase') {
+    const afterAmountNoun = lower.match(/(?:₹|rs\.?|inr)?\s*[0-9,k\.]+\s+(?:a|an|the)?\s*([a-z0-9]+)/i)
+    if (afterAmountNoun && afterAmountNoun[1]) {
+      const candidate = afterAmountNoun[1].trim()
+      if (candidate && !['in', 'for', 'on', 'months', 'month', 'years', 'year', 'percent', '%', 'laptop', 'phone'].includes(candidate)) {
+        description = candidate.charAt(0).toUpperCase() + candidate.slice(1)
+      } else if (candidate === 'laptop' || candidate === 'phone') {
+        description = candidate.charAt(0).toUpperCase() + candidate.slice(1)
+      }
     }
+  }
+
+  // Pattern C: "afford a ₹50,000 laptop"
+  if (description === 'Purchase') {
+    const buyMatch = lower.match(/(?:buy|purchase|afford|spend)\s+(?:a|an|the)?\s*(?:₹|rs\.?|inr)?\s*[0-9,k\.]*\s*([a-z0-9]+)/i)
+    if (buyMatch && buyMatch[1]) {
+      const candidate = buyMatch[1].trim()
+      if (candidate && !['can', 'i', 'spend', 'buy', 'afford', 'a', 'an', 'the', 'my', 'me', 'how', 'much'].includes(candidate) && !/^[0-9,₹\s]+$/.test(candidate)) {
+        description = candidate.charAt(0).toUpperCase() + candidate.slice(1)
+      }
+    }
+  }
+
+  // Sanitize description if it accidentally contains digits or currency symbols
+  if (!description || /^[0-9,₹\s]+$/.test(description)) {
+    description = 'Purchase'
   }
 
   // 5. Determine Decision Intent Type

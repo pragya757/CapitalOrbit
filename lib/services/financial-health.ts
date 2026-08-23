@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-import type { FinancialHealthSummary, ObligationBreakdownItem, GoalBreakdownItem, ScoreBreakdown } from '../types'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import type { FinancialHealthSummary, ObligationBreakdownItem, GoalBreakdownItem, ScoreBreakdown } from '@/lib/types'
 
 const ESSENTIAL_CATEGORIES = new Set([
   'food',

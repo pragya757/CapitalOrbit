@@ -20,6 +20,7 @@ import {
 } from '@/lib/constants'
 import { formatCurrency } from '@/lib/format'
 import type { PaymentMethod } from '@/lib/types'
+import { ExpenseCalendarView } from './expense-calendar-view'
 import {
   Search,
   Filter,
@@ -27,6 +28,7 @@ import {
   Trash2,
   LayoutList,
   LayoutGrid,
+  Calendar as CalendarIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -34,7 +36,7 @@ import { AddExpenseDialog } from './add-expense-dialog'
 import { recordUserCategoryCorrection } from '@/lib/actions/categorize'
 import { toast } from 'sonner'
 
-type ViewMode = 'list' | 'grouped'
+type ViewMode = 'list' | 'grouped' | 'calendar'
 
 export function ExpensesPage() {
   const { expenses, deleteExpense, user, categories, refreshData, updateExpense } = useExpenses()
@@ -122,7 +124,7 @@ export function ExpensesPage() {
         <AddExpenseDialog />
       </div>
 
-      <Card>
+      <Card className="border-purple-300 dark:border-purple-800/60 bg-gradient-to-br from-[#FAF5FF] to-[#F3E8FF] dark:from-[#1C1426] dark:to-[#120B1A] rounded-2xl shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="relative flex-1 max-w-sm">
@@ -174,31 +176,49 @@ export function ExpensesPage() {
               </Select>
 
               {/* View mode toggle */}
-              <div className="flex items-center rounded-lg border p-0.5">
+              <div className="flex items-center rounded-lg border p-0.5 bg-white/80 dark:bg-purple-950/80">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="icon"
-                  className="h-8 w-8"
+                  size="sm"
+                  className="h-8 px-2.5 text-xs font-bold gap-1"
                   onClick={() => setViewMode('list')}
                   title="List view"
                 >
-                  <LayoutList className="h-4 w-4" />
+                  <LayoutList className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">List View</span>
                 </Button>
                 <Button
                   variant={viewMode === 'grouped' ? 'default' : 'ghost'}
-                  size="icon"
-                  className="h-8 w-8"
+                  size="sm"
+                  className="h-8 px-2.5 text-xs font-bold gap-1"
                   onClick={() => setViewMode('grouped')}
                   title="Grouped by category"
                 >
-                  <LayoutGrid className="h-4 w-4" />
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Grouped View</span>
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+                  size="sm"
+                  className="h-8 px-2.5 text-xs font-bold gap-1"
+                  onClick={() => setViewMode('calendar')}
+                  title="Calendar view"
+                >
+                  <CalendarIcon className="h-3.5 w-3.5 text-purple-600" />
+                  <span className="hidden sm:inline">Calendar View 📅</span>
                 </Button>
               </div>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {filteredExpenses.length === 0 ? (
+          {viewMode === 'calendar' ? (
+            <ExpenseCalendarView
+              searchQuery={search}
+              initialCategoryFilter={categoryFilter}
+              initialPaymentFilter={paymentFilter}
+            />
+          ) : filteredExpenses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                 <Search className="h-6 w-6 text-muted-foreground" />

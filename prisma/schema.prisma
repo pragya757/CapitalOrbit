@@ -58,6 +58,9 @@ model Expense {
   categorySource     String?
   categoryConfidence Float?
   categoryReason     String?
+  failureReason      String?
+  failureCode        String?
+  failureSource      String?
   createdAt          DateTime @default(now())
 }
 

@@ -109,7 +109,7 @@ export function RazorpayStatusCard() {
   }, [])
 
   return (
-    <Card>
+    <Card className="border-sky-300 dark:border-sky-800/60 bg-gradient-to-br from-[#F0F9FF] to-[#E0F2FE] dark:from-[#0A2E3B] dark:to-[#051C26] rounded-2xl shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

@@ -30,9 +30,9 @@ export function FinancialInsightsCard() {
 
   if (loading) {
     return (
-      <Card className="border-[#E4DED5] dark:border-[#3D2D3D] bg-[#FFFCF7] dark:bg-[#261B26] rounded-2xl p-6">
-        <div className="flex items-center gap-2 text-[#756E72] text-xs">
-          <RefreshCw className="h-4 w-4 animate-spin text-[#3B1F3A]" /> Generating Financial Insights...
+      <Card className="border-amber-300 dark:border-amber-800/60 bg-gradient-to-br from-[#FFFDF0] to-[#FEF9C3] dark:from-[#3B2E0A] dark:to-[#261E05] rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 text-xs">
+          <RefreshCw className="h-4 w-4 animate-spin text-amber-700" /> Generating Financial Insights...
         </div>
       </Card>
     )
@@ -41,22 +41,22 @@ export function FinancialInsightsCard() {
   if (!data || data.insights.length === 0) return null
 
   return (
-    <Card className="border-[#C6E7DE] dark:border-[#2E4D45] bg-[#F0F9F6] dark:bg-[#1A2824] rounded-2xl shadow-md">
-      <CardHeader className="pb-3 border-b border-[#E4DED5]/60 dark:border-[#3D2D3D]/60">
+    <Card className="border-amber-300 dark:border-amber-800/60 bg-gradient-to-br from-[#FFFDF0] to-[#FEF9C3] dark:from-[#3B2E0A] dark:to-[#261E05] rounded-2xl shadow-sm">
+      <CardHeader className="pb-3 border-b border-amber-200 dark:border-amber-900/60">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#3B1F3A] text-white">
-              <Lightbulb className="h-4 w-4 text-[#D8A84E]" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500 text-white font-bold shadow-sm">
+              <Lightbulb className="h-4 w-4 text-white" />
             </div>
             <div>
-              <CardTitle className="text-base font-serif font-bold text-[#3B1F3A] dark:text-[#F7F4ED]">Financial Insights & Recommendations</CardTitle>
-              <CardDescription className="text-xs text-[#756E72]">
+              <CardTitle className="text-base font-serif font-bold text-amber-950 dark:text-amber-100">Financial Insights & Recommendations</CardTitle>
+              <CardDescription className="text-xs text-amber-800 dark:text-amber-300">
                 Explainable intelligence derived from your cash flow
               </CardDescription>
             </div>
           </div>
-          <Badge variant="outline" className="text-[10px] font-semibold uppercase gap-1 border-[#3B1F3A]/20">
-            <Sparkles className="h-3 w-3 text-[#E9785B]" /> CapitalOrbit AI
+          <Badge variant="outline" className="text-[10px] font-bold uppercase gap-1 border-amber-400 dark:border-amber-700 text-amber-900 dark:text-amber-100 bg-white/80 dark:bg-amber-950/80">
+            <Sparkles className="h-3 w-3 text-amber-600" /> CapitalOrbit AI
           </Badge>
         </div>
       </CardHeader>
@@ -67,34 +67,30 @@ export function FinancialInsightsCard() {
             <div
               key={ins.id}
               className={cn(
-                'rounded-xl border p-3.5 space-y-2 transition-colors',
-                ins.severity === 'CRITICAL'
-                  ? 'bg-[#E9785B]/10 border-[#E9785B]/30'
-                  : ins.severity === 'WARNING'
-                  ? 'bg-[#D8A84E]/10 border-[#D8A84E]/30'
-                  : ins.severity === 'POSITIVE'
-                  ? 'bg-[#72B8A5]/10 border-[#72B8A5]/30'
-                  : 'bg-[#F7F4ED]/60 border-[#E4DED5]'
+                'rounded-xl border p-3.5 space-y-2 transition-colors bg-white/80 dark:bg-[#261E05]/80 border-amber-200 dark:border-amber-900/60',
+                ins.severity === 'CRITICAL' && 'border-rose-400 bg-rose-50/80 dark:bg-rose-950/40',
+                ins.severity === 'WARNING' && 'border-amber-400 bg-amber-50/80 dark:bg-amber-950/40',
+                ins.severity === 'POSITIVE' && 'border-emerald-400 bg-emerald-50/80 dark:bg-emerald-950/40'
               )}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold text-[#3B1F3A] dark:text-[#F7F4ED]">
-                  {ins.severity === 'CRITICAL' && <ShieldAlert className="h-4 w-4 text-[#E9785B] shrink-0" />}
-                  {ins.severity === 'WARNING' && <AlertTriangle className="h-4 w-4 text-[#D8A84E] shrink-0" />}
-                  {ins.severity === 'POSITIVE' && <CheckCircle2 className="h-4 w-4 text-[#72B8A5] shrink-0" />}
-                  {ins.severity === 'INFO' && <Info className="h-4 w-4 text-[#3B1F3A] shrink-0" />}
+                <div className="flex items-center gap-2 font-bold text-amber-950 dark:text-amber-100">
+                  {ins.severity === 'CRITICAL' && <ShieldAlert className="h-4 w-4 text-rose-600 shrink-0" />}
+                  {ins.severity === 'WARNING' && <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />}
+                  {ins.severity === 'POSITIVE' && <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />}
+                  {ins.severity === 'INFO' && <Info className="h-4 w-4 text-amber-800 shrink-0" />}
                   <span>{ins.title}</span>
                 </div>
 
-                <Badge variant="outline" className="font-mono text-[10px] shrink-0 font-semibold border-[#3B1F3A]/20">
+                <Badge variant="outline" className="font-mono text-[10px] shrink-0 font-bold border-amber-300 dark:border-amber-700">
                   {ins.metric}
                 </Badge>
               </div>
 
-              <p className="text-[#756E72] dark:text-[#A89FA6] text-[11px] leading-relaxed">{ins.explanation}</p>
+              <p className="text-amber-900 dark:text-amber-200 text-[11px] leading-relaxed">{ins.explanation}</p>
 
               {ins.recommendedAction && (
-                <p className="text-[#3B1F3A] dark:text-[#F7F4ED] font-semibold text-[10px] pt-1 border-t border-[#E4DED5]/40">
+                <p className="text-amber-950 dark:text-amber-100 font-semibold text-[10px] pt-1 border-t border-amber-200 dark:border-amber-900/60">
                   💡 <strong>Action:</strong> {ins.recommendedAction}
                 </p>
               )}

@@ -257,3 +257,43 @@ export interface FinancialDecisionResult {
   createdAt?: string
 }
 
+// CapitalOrbit AI Merchant Copilot Types
+export type CopilotIntent =
+  | 'PAYMENT_FAILURES'
+  | 'REVENUE_RISK'
+  | 'FAILURE_SPIKE'
+  | 'PAYMENT_METHOD_ANALYSIS'
+  | 'FINANCIAL_HEALTH'
+  | 'SPENDING_ANALYSIS'
+  | 'CASH_FLOW'
+  | 'FORECAST'
+  | 'FINANCIAL_DECISION'
+  | 'GOAL_ANALYSIS'
+  | 'FINANCIAL_SUMMARY'
+  | 'REVENUE_RECOVERY'
+  | 'UNKNOWN'
+
+export interface CopilotMetricItem {
+  label: string
+  value: string
+}
+
+export interface CopilotEvidenceItem {
+  label: string
+  value: string
+  source: string
+}
+
+export interface CopilotResponse {
+  success: boolean
+  intent: CopilotIntent
+  answer: string
+  confidence: number
+  metrics?: CopilotMetricItem[]
+  evidence?: CopilotEvidenceItem[]
+  recommendations?: string[]
+  severity?: 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+  disclaimer?: string
+}
+
+

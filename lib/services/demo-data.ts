@@ -40,14 +40,51 @@ export async function seedDemoData(userId: string) {
     })
   }
 
-  // 2. SEED REALISTIC EXPENSES
+  // 2. SEED REALISTIC EXPENSES (CAPTURED & FAILED)
   const demoExpenses = [
-    { description: 'Apartment Rent Payment', amount: 12000, category: 'housing', paymentMethod: 'bank_transfer' },
-    { description: 'Swiggy Food & Dining', amount: 5000, category: 'food', paymentMethod: 'upi' },
-    { description: 'Uber Rides & Petrol', amount: 3000, category: 'transportation', paymentMethod: 'upi' },
-    { description: 'PVR Movies & Netflix', amount: 2000, category: 'entertainment', paymentMethod: 'card' },
-    { description: 'Electricity & Water Bill', amount: 2500, category: 'utilities', paymentMethod: 'upi' },
-    { description: 'Amazon Apparel & Goods', amount: 3500, category: 'shopping', paymentMethod: 'card' },
+    { description: 'Apartment Rent Payment', amount: 12000, category: 'housing', paymentMethod: 'bank_transfer', status: 'captured' },
+    { description: 'Swiggy Food & Dining', amount: 5000, category: 'food', paymentMethod: 'upi', status: 'captured' },
+    { description: 'Uber Rides & Petrol', amount: 3000, category: 'transportation', paymentMethod: 'upi', status: 'captured' },
+    { description: 'PVR Movies & Netflix', amount: 2000, category: 'entertainment', paymentMethod: 'card', status: 'captured' },
+    { description: 'Electricity & Water Bill', amount: 2500, category: 'utilities', paymentMethod: 'upi', status: 'captured' },
+    { description: 'Amazon Apparel & Goods', amount: 3500, category: 'shopping', paymentMethod: 'card', status: 'captured' },
+    // Failed payments for Transaction Failure Intelligence
+    {
+      description: 'Flight Booking Attempt (Timeout)',
+      amount: 12000,
+      category: 'travel',
+      paymentMethod: 'upi',
+      status: 'failed',
+      failureReason: 'Payment timed out before gateway confirmation',
+      failureCode: 'GATEWAY_ERROR_PAYMENT_TIMED_OUT',
+      failureSource: 'gateway',
+      razorpayPaymentId: 'pay_fail_demo_101',
+      razorpayOrderId: 'order_fail_demo_101',
+    },
+    {
+      description: 'Electronics Store Purchase (Bank Decline)',
+      amount: 8500,
+      category: 'shopping',
+      paymentMethod: 'card',
+      status: 'failed',
+      failureReason: 'Transaction declined by issuing bank',
+      failureCode: 'BAD_REQUEST_PAYMENT_DECLINED_BY_BANK',
+      failureSource: 'bank',
+      razorpayPaymentId: 'pay_fail_demo_102',
+      razorpayOrderId: 'order_fail_demo_102',
+    },
+    {
+      description: 'Zomato Super Order (Insufficient Balance)',
+      amount: 1450,
+      category: 'food',
+      paymentMethod: 'upi',
+      status: 'failed',
+      failureReason: 'Insufficient balance in bank account',
+      failureCode: 'BAD_REQUEST_PAYMENT_ACCOUNT_INSUFFICIENT_BALANCE',
+      failureSource: 'customer',
+      razorpayPaymentId: 'pay_fail_demo_103',
+      razorpayOrderId: 'order_fail_demo_103',
+    },
   ]
 
   for (const exp of demoExpenses) {
@@ -68,11 +105,16 @@ export async function seedDemoData(userId: string) {
           paymentMethod: exp.paymentMethod,
           isRecurring: exp.category === 'housing' || exp.category === 'utilities',
           source: 'demo_seed',
-          status: 'captured',
+          status: exp.status || 'captured',
           merchantName: exp.description.split(' ')[0],
           categorySource: intel.source,
           categoryConfidence: intel.confidence,
           categoryReason: intel.reason,
+          failureReason: exp.failureReason || null,
+          failureCode: exp.failureCode || null,
+          failureSource: exp.failureSource || null,
+          razorpayPaymentId: exp.razorpayPaymentId || null,
+          razorpayOrderId: exp.razorpayOrderId || null,
         },
       })
     }

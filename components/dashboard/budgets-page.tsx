@@ -182,7 +182,7 @@ export function BudgetsPage() {
       </div>
 
       {/* Overall Budget Card */}
-      <Card>
+      <Card className="border-indigo-300 dark:border-indigo-800/60 bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] dark:from-[#171E3B] dark:to-[#0E1328] rounded-2xl shadow-sm">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

@@ -3,9 +3,11 @@
 import { StatsCards } from './stats-cards'
 import { FinancialHealthCard } from './financial-health-card'
 import { DecisionCenter } from './decision-center'
+import { CopilotChat } from './copilot-chat'
 import { FinancialAlerts } from './financial-alerts'
 import { ForecastCard } from './forecast-card'
 import { FinancialInsightsCard } from './financial-insights-card'
+import { TransactionFailureCard } from './transaction-failure-card'
 import { FinancialReportDialog } from './financial-report-dialog'
 import { RecentExpenses } from './recent-expenses'
 import { SpendingChart } from './spending-chart'
@@ -31,7 +33,7 @@ const itemVariants = {
 
 export function DashboardView() {
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 max-w-7xl mx-auto">
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 max-w-7xl mx-auto relative">
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -57,6 +59,11 @@ export function DashboardView() {
       {/* Primary Section: AI Decision Center ("Ask Before You Spend") */}
       <motion.div variants={itemVariants}>
         <DecisionCenter />
+      </motion.div>
+
+      {/* Transaction Failure Intelligence Section */}
+      <motion.div variants={itemVariants}>
+        <TransactionFailureCard />
       </motion.div>
 
       {/* Alerts & 30/60/90-Day Forecast Section */}
@@ -93,6 +100,9 @@ export function DashboardView() {
       <motion.div variants={itemVariants}>
         <RecentExpenses />
       </motion.div>
+
+      {/* Floating CapitalOrbit AI Merchant Copilot Chatbot */}
+      <CopilotChat />
     </motion.div>
   )
 }

@@ -82,8 +82,8 @@ export function SavingsGoalsPage() {
                   transition={{ delay: i * 0.05 }}
                 >
                   <Card className={cn(
-                    "h-full rounded-2xl border bg-card/60 backdrop-blur transition-all",
-                    achieved && "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+                    "h-full rounded-2xl border bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] dark:from-[#171E3B] dark:to-[#0E1328] border-indigo-300 dark:border-indigo-800/60 shadow-sm transition-all",
+                    achieved && "border-emerald-500/50 bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] dark:from-[#0B2B1B] dark:to-[#061C11]"
                   )}>
                     <CardHeader className="pb-2">
                       <div className="flex items-start justify-between">

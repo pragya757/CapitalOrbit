@@ -106,7 +106,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile Settings */}
-      <Card>
+      <Card className="border-indigo-300 dark:border-indigo-800/60 bg-gradient-to-br from-[#EEF2FF] to-[#E0E7FF] dark:from-[#171E3B] dark:to-[#0E1328] rounded-2xl shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <User className="h-5 w-5 text-primary" />
@@ -170,7 +170,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Data Management */}
-      <Card>
+      <Card className="border-teal-300 dark:border-teal-800/60 bg-gradient-to-br from-[#F0FDFA] to-[#CCFBF1] dark:from-[#0B2524] dark:to-[#061817] rounded-2xl shadow-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Download className="h-5 w-5 text-primary" />
