@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import type { Expense, CategorizationResult } from '../types'
 import { getCategoryLabel } from '../constants'
-
-const prisma = new PrismaClient()
 
 /**
  * Extracts and cleans raw merchant names from transaction descriptions or metadata.

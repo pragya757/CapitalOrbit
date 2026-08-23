@@ -2,10 +2,8 @@
 
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { setSession, deleteSession } from '@/lib/auth'
-
-const prisma = new PrismaClient()
 
 // Validation Schemas
 const signupSchema = z.object({

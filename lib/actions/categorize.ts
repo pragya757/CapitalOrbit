@@ -1,14 +1,12 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import {
   categorizeTransaction,
   getUserMerchantPreferencesMap,
   saveUserMerchantPreference,
 } from '@/lib/services/transaction-intelligence'
-
-const prisma = new PrismaClient()
 
 export interface CategorizeSummary {
   success: boolean

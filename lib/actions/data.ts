@@ -1,11 +1,9 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import type { Expense, Budget, Income, RecurringRule, User, CategoryItem } from '@/lib/types'
 import { DEFAULT_CATEGORIES } from '@/lib/constants'
-
-const prisma = new PrismaClient()
 
 // Default categories to seed for each user
 const DEFAULT_CATEGORY_NAMES = DEFAULT_CATEGORIES as string[]

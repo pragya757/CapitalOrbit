@@ -1,12 +1,10 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { parseNaturalLanguageQuery } from '@/lib/services/decision-parser'
 import { evaluateFinancialDecision } from '@/lib/services/decision-engine'
 import type { FinancialDecisionRequest, FinancialDecisionResult } from '@/lib/types'
-
-const prisma = new PrismaClient()
 
 /**
  * Processes a financial query or request, evaluates decision, and logs to database.

@@ -1,14 +1,12 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import {
   isRazorpayConfigured,
   fetchRazorpayPayments,
   normalizeRazorpayPayment,
 } from '@/lib/razorpay'
-
-const prisma = new PrismaClient()
 
 export interface SyncSummary {
   success: boolean
